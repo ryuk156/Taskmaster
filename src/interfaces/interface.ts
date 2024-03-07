@@ -15,3 +15,8 @@ export interface Board {
     title: string;
     columns: Column[];
   }
+
+export const ItemTypes = {
+    COLUMN: 'column',
+    CARD: 'card'
+}

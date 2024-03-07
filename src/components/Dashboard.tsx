@@ -4,5 +4,6 @@ import AllBoard from './AllBoard'
 export default function Dashboard() {
   return (
    <AllBoard />
+   
   )
 }
