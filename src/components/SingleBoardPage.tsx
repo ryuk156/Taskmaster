@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, Button, Flex, Heading } from "@chakra-ui/react";
@@ -16,53 +16,53 @@ function SingleBoardPage() {
 
   const dispatch = useDispatch(); // Redux dispatch function
 
-  const onClose = () => setIsOpen(false);
-  const onOpen = (columnId: number) => {
+  const onClose = useCallback(() => setIsOpen(false), []);
+  const onOpen = useCallback((columnId: number) => {
     setIsOpen(true);
     setColumnId(columnId);
-  };
+  }, []);
 
-  const onCloseColumn = () => setIsOpenColumn(false);
-  const onOpenColumn = () => {
-    setIsOpenColumn(true);
-  };
+  const onCloseColumn = useCallback(() => setIsOpenColumn(false), []);
+  const onOpenColumn = useCallback(() => setIsOpenColumn(true), []);
 
   const { boardId } = useParams();
   const parsedBoardId = boardId ? parseInt(boardId) : undefined;
+
+  const moveColumn = useCallback((dragIndex: number, hoverIndex: number) => {
+    dispatch(swapColumn({ parsedBoardId, dragIndex, hoverIndex }));
+  }, [dispatch, parsedBoardId, swapColumn]);
 
   const board = useSelector((state: any) =>
     state.task.find((task: any) => task.id === parsedBoardId)
   );
 
+  const moveCard = useCallback(
+    (
+      dragColumnIndex: number,
+      hoverColumnIndex: number,
+      dragCardIndex: number,
+      hoverCardIndex: number
+    ) => {
+      console.log(
+        { dragCardIndex: dragCardIndex },
+        { hoverCardIndex: hoverCardIndex }
+      );
+      dispatch(
+        swapCard({
+          parsedBoardId,
+          dragColumnIndex,
+          hoverColumnIndex,
+          dragCardIndex,
+          hoverCardIndex,
+        })
+      );
+    },
+    [dispatch, parsedBoardId, swapCard]
+  );
+
   if (!board) {
     return <div>Board not found!</div>;
-  } else {
-    // console.log(board);
   }
-
-  // Function to handle column movement
-  const moveColumn = (dragIndex: number, hoverIndex: number) => {
-    dispatch(swapColumn({ parsedBoardId, dragIndex, hoverIndex }));
-  };
-
-  const moveCard = (
-    dragColumnIndex: number,
-    hoverColumnIndex: number,
-    dragCardIndex: number,
-    hoverCardIndex: number
-  ) => {
-
-    console.log({dragCardIndex:  dragCardIndex},{hoverCardIndex: hoverCardIndex} )
-    dispatch(
-      swapCard({
-        parsedBoardId,
-        dragColumnIndex,
-        hoverColumnIndex,
-        dragCardIndex,
-        hoverCardIndex,
-      })
-    );
-  };
 
   return (
     <Box m={2}>
@@ -95,25 +95,29 @@ function SingleBoardPage() {
         overflow={"scroll"}
         width={"100%"}
       >
-        {board &&
-          board.columns.map((column: any, colIndex: number) => {
-            return (
-              <Column
-                key={colIndex}
-                column={column}
-                index={colIndex} // Pass the index
-                moveColumn={moveColumn} // Pass the moveColumn function
-              >
-                {column.cards &&
-                  column.cards.map((card: any, index: number) => (
-                    <Card card={card} key={index} column={column} index={index}  columnIndex={colIndex} moveCard={moveCard}/>
-                  ))}
-                <Button onClick={() => onOpen(column.id)}>+Add Card</Button>
-              </Column>
-            );
-          })}
+        {board.columns.map((column: any, colIndex: number) => (
+          <Column
+            key={colIndex}
+            column={column}
+            index={colIndex} // Pass the index
+            moveColumn={moveColumn} // Pass the moveColumn function
+          >
+            {column.cards &&
+              column.cards.map((card: any, index: number) => (
+                <Card
+                  card={card}
+                  key={index}
+                  column={column}
+                  index={index}
+                  columnIndex={colIndex}
+                  moveCard={moveCard}
+                />
+              ))}
+            <Button onClick={() => onOpen(column.id)}>+Add Card</Button>
+          </Column>
+        ))}
       </Box>
-      <CreateCardModal isOpen={isOpen} onClose={onClose} columnId={columnId}  />
+      <CreateCardModal isOpen={isOpen} onClose={onClose} columnId={columnId} />
     </Box>
   );
 }

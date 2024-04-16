@@ -1,16 +1,18 @@
 import { Box } from "@chakra-ui/react";
-import React, { Children } from "react";
+import React from "react";
 import { ItemTypes } from "../interfaces/interface";
 import { useDrag, useDrop } from "react-dnd";
 
-interface col {
+interface ColumnProps {
   column: any;
-  children: any;
   index: number;
-  moveColumn: (dragIndex: number, hoverIndex: number) => void;
+  moveColumn: any;
+  children: React.ReactNode;
 }
 
-const Column: React.FC<col> = ({ column, children, index, moveColumn }) => {
+const Column: React.FC<ColumnProps> = ({ column, index, moveColumn, children }) => {
+  const ref = React.useRef<HTMLDivElement>(null);
+
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.COLUMN,
     item: { id: column && column.id, index },
@@ -18,9 +20,6 @@ const Column: React.FC<col> = ({ column, children, index, moveColumn }) => {
       isDragging: !!monitor.isDragging(),
     }),
   }));
-
-  
-
 
   const [, drop] = useDrop({
     accept: ItemTypes.COLUMN,
@@ -35,16 +34,35 @@ const Column: React.FC<col> = ({ column, children, index, moveColumn }) => {
         return;
       }
 
+      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+      if (!hoverBoundingRect) {
+        return; // Skip the rest of the function if the bounding rectangle is not available
+      }
+
+      // Get the vertical middle of the drop target
+      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      // Get the client offset of the mouse pointer
+      const clientOffset = monitor.getClientOffset();
+      if (!clientOffset) {
+        return;
+      }
+      // Get the distance from the top of the drop target
+      const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+
+      // Only move when the mouse has crossed half of the items height
+      // When dragging downwards, only move when the cursor is below 50%
+      // When dragging upwards, only move when the cursor is above 50%
+      if ((dragIndex < hoverIndex && hoverClientY < hoverMiddleY) ||
+          (dragIndex > hoverIndex && hoverClientY > hoverMiddleY)) {
+        return;
+      }
+
       moveColumn(dragIndex, hoverIndex);
-      console.log(dragIndex,hoverIndex)
       item.index = hoverIndex;
     },
   });
 
-  const ref = React.useRef<HTMLDivElement>(null);
   drag(drop(ref));
-
-
 
   return (
     <Box
@@ -57,14 +75,10 @@ const Column: React.FC<col> = ({ column, children, index, moveColumn }) => {
       p={4}
       borderRadius="lg"
       minWidth="200px"
+      opacity={isDragging ? 0.5 : 1}
     >
       {column && column.columnTitle}
-
-      <Box>
       {children}
-      </Box>
-
-      
     </Box>
   );
 };

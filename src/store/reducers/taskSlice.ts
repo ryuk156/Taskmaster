@@ -64,9 +64,10 @@ const taskSlice = createSlice({
       const board = state.find((board) => board.id === parsedBoardId);
 
       if (board) {
-        const temp = board.columns[dragIndex];
-        board.columns[dragIndex] = board.columns[hoverIndex];
-        board.columns[hoverIndex] = temp;
+         let temp = board.columns[dragIndex];
+          board.columns[dragIndex] = board.columns[hoverIndex];
+          board.columns[hoverIndex] = temp;
+        
       }
     },
     swapCard: (state, action) => {
@@ -77,42 +78,44 @@ const taskSlice = createSlice({
         dragColumnIndex,
         hoverColumnIndex,
       } = action.payload;
-    
+
       // Find the board by ID
       const board = state.find((board) => board.id === parsedBoardId);
-    
+
       if (board) {
         const dragColumn = board.columns.find(
           (column) => column.id === dragColumnIndex
         );
-        const hoverColumn = board.columns.find(
-          (column) => column.id === hoverColumnIndex
-        );
-    
-        // Ensure both dragColumn and hoverColumn are valid
-        if (dragColumn && hoverColumn) {
+        // const hoverColumn = board.columns.find(
+        //   (column) => column.id === hoverColumnIndex
+        // );
+
+        // Ensure dragColumn is valid
+        if (dragColumn) {
           // If moving within the same column
-          if (dragColumn === hoverColumn && dragCardIndex !== hoverCardIndex) {
+          if (dragColumn === dragColumn && dragCardIndex !== hoverCardIndex) {
             const temp = dragColumn.cards[dragCardIndex];
             dragColumn.cards[dragCardIndex] = dragColumn.cards[hoverCardIndex];
             dragColumn.cards[hoverCardIndex] = temp;
-          } 
-          // If moving between different columns
-          else if (dragColumn !== hoverColumn && dragCardIndex !== hoverCardIndex) {
-            const draggedCard = dragColumn.cards[dragCardIndex];
-    
-            // Handle the case where the dragColumn is empty and hoverCardIndex is undefined
-            if (dragColumn.cards.length === 0 && hoverCardIndex === undefined) {
-              hoverColumn.cards.splice(0, 0, draggedCard);
-            } else {
-              dragColumn.cards.splice(dragCardIndex, 1);
-              hoverColumn.cards.splice(hoverCardIndex, 0, draggedCard);
-            }
           }
+          // If moving between different columns
+          // else if (
+          //   dragColumn !== hoverColumn &&
+          //   dragCardIndex !== hoverCardIndex
+          // ) {
+          //   const draggedCard = dragColumn.cards[dragCardIndex];
+
+          //   // Handle the case where the dragColumn is empty and hoverCardIndex is undefined
+          //   if (dragColumn.cards.length === 0 && hoverCardIndex === undefined) {
+          //     hoverColumn.cards.splice(0, 0, draggedCard);
+          //   } else {
+          //     dragColumn.cards.splice(dragCardIndex, 1);
+          //     hoverColumn.cards.splice(hoverCardIndex, 0, draggedCard);
+          //   }
+          // }
         }
       }
-    }
-,    
+    },
     moveCardBetweenColumns: (state, action) => {},
   },
 });
