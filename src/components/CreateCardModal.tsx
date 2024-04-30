@@ -12,8 +12,9 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { addCardToColumn } from "../store/reducers/taskSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { createCardAsync } from "../store/reducers/taskSlice";
+// import { addCardToColumn } from "../store/reducers/taskSlice";
 
 interface CreateCardModalProps {
   isOpen: boolean;
@@ -21,47 +22,75 @@ interface CreateCardModalProps {
   columnId: number;
 }
 
+const styles = {
+  modalStyle: {
+    width: "400px",
+    height: "250px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+
+    top: "0px",
+    left: "0px",
+    right: "0px",
+    bottom: "0px",
+    margin: "auto",
+  },
+  input: {
+    border: "1px solid #CBD5E0",
+    borderRadius: "4px",
+    marginBottom: "15px",
+    padding: "10px",
+    width: "220px",
+  },
+};
+
 const CreateCardModal: React.FC<CreateCardModalProps> = ({
   isOpen,
   onClose,
   columnId,
 }) => {
-  const dispatch = useDispatch();
   const [cardTitle, setCardTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
 
-  const addCard = (columnid: number) => {
-    if (cardTitle.trim() !== "" && content.trim() !== "") {
-      const newCard = {
-        columnTaskTitle: cardTitle,
-        content: content,
-      };
-      dispatch(addCardToColumn({ columnId, newCard }));
+  const dispatch = useDispatch<any>();
+  const token = useSelector((state: any) => state.auth.token);
+  const loading = useSelector((state: any) => state.task.loading);
 
-      onClose(); // Close the modal after adding the card
+  const addCard = () => {
+    if (cardTitle.trim() !== "" && content.trim() !== "") {
+      dispatch(
+        createCardAsync({
+          token: token,
+          column: columnId,
+          name: cardTitle,
+          content: content,
+        })
+      );
+      onClose()
     }
+
+    // if (cardTitle.trim() !== "" && content.trim() !== "") {
+    //   const newCard = {
+    //     columnTaskTitle: cardTitle,
+    //     content: content,
+    //   };
+    //  // dispatch(addCardToColumn({ columnId, newCard }));
+
+    //   onClose(); // Close the modal after adding the card
+    // }
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent
-        style={{
-          width: "400px",
-          height: "200px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "absolute",
-          top: "0",
-          left: "0",
-          right: "0",
-          bottom: "0",
-          margin: "auto",
-        }}
+        style={{ ...styles.modalStyle, position: "absolute" }}
         bg="gray.200"
       >
-        <ModalHeader fontWeight={"bold"} fontSize={22}>Add Card</ModalHeader>
+        <ModalHeader fontWeight={"bold"} fontSize={22}>
+          Add Card
+        </ModalHeader>
 
         <ModalBody>
           <Flex flexDirection={"column"} gap={3}>
@@ -73,6 +102,7 @@ const CreateCardModal: React.FC<CreateCardModalProps> = ({
               placeholder="Title"
               value={cardTitle}
               p={1}
+              style={styles.input}
             />
 
             <Input
@@ -91,11 +121,14 @@ const CreateCardModal: React.FC<CreateCardModalProps> = ({
             Close
           </Button>
           <Button
+            colorScheme="blue"
+          isLoading={loading}
             onClick={() => {
-              addCard(columnId);
+              addCard();
               setCardTitle("");
               setContent("");
             }}
+            variant={"outline"}
           >
             Save
           </Button>

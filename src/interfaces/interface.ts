@@ -14,9 +14,19 @@ export interface Board {
     id: number;
     title: string;
     columns: Column[];
+    loading: boolean,
+    error: any,
   }
 
 export const ItemTypes = {
     COLUMN: 'column',
     CARD: 'card'
 }
+
+export interface LoginCredentials {
+  username: string;
+  password: string;
+}
+
+
+export const URL= 'http://127.0.0.1:8082/api/'

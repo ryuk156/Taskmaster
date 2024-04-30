@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { addColumnToBoard } from "../store/reducers/taskSlice";
+import { useDispatch, useSelector } from "react-redux";
+// import { addColumnToBoard } from "../store/reducers/taskSlice";
 
 import {
   Modal,
@@ -11,11 +11,23 @@ import {
   Button,
   Input,
 } from "@chakra-ui/react";
+import { useParams } from "react-router-dom";
+import { createColumnAsync } from "../store/reducers/taskSlice";
 
 interface CreateBoardColumnProps {
   boardId: number; // Define the prop type for boardId
   isOpen: boolean;
   onClose: () => void;
+}
+
+const styles = {
+  input: {
+    border: "1px solid #CBD5E0",
+    borderRadius: "4px",
+    marginBottom: "15px",
+    padding: "10px",
+    width: "220px",
+  },
 }
 
 const CreateBoardColumn: React.FC<CreateBoardColumnProps> = ({
@@ -24,12 +36,17 @@ const CreateBoardColumn: React.FC<CreateBoardColumnProps> = ({
   onClose,
 }) => {
   const [boardColumnTitle, setBoardColumnTitle] = useState<string>("");
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<any>();
+  const  token =  useSelector((state: any) => state.auth.token);
+  const loading =  useSelector((state: any) => state.task.loading);
+ 
 
-  const addColumn = (boardId: number, boardColumnTitle: string) => {
-    dispatch(addColumnToBoard({ boardId, columnTitle: boardColumnTitle })); // Dispatch addColumnToBoard action with payload
+  const addColumn = () => {
+  dispatch(createColumnAsync({ token: token, name: boardColumnTitle , board : boardId })); // Dispatch addColumnToBoard action with payload
     setBoardColumnTitle("");
   };
+
+
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -51,23 +68,27 @@ const CreateBoardColumn: React.FC<CreateBoardColumnProps> = ({
       >
         <ModalHeader fontWeight={"bold"} fontSize={22}>Add Task</ModalHeader>
 
-        <ModalBody mt={2}>
+        <ModalBody mt={1}>
           <Input
             type="text"
             onChange={(e: any) => setBoardColumnTitle(e.target.value)}
             placeholder="Title"
             p={1}
+            style={styles.input}
           />
         </ModalBody>
-        <ModalFooter mt={3}>
+        <ModalFooter mt={1}>
           <Button colorScheme="blue" mr={3} onClick={onClose}>
-            Cancel
+            Close
           </Button>
           <Button
+          isLoading={loading}
+          variant={'outline'}
             onClick={() => {
-              addColumn(boardId, boardColumnTitle);
+              addColumn();
               onClose()
             }}
+            colorScheme="blue"
           >
             Save
           </Button>

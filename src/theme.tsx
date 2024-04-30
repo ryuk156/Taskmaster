@@ -1,5 +1,6 @@
 import { extendBaseTheme, theme as chakraTheme } from "@chakra-ui/react";
 
+
 export const theme = extendBaseTheme({
   components: {
     Button: {
@@ -22,5 +23,29 @@ export const theme = extendBaseTheme({
         },
       },
     },
+    Heading: {  
+      baseStyle: {
+        color: "black",
+        fontWeight: "bold",
+        fontSize: "2xl",
+        padding: "10px",
+        
+      },
+      variants: {
+        h8: {
+          
+          fontSize: "36px",
+          fontWeight: "bold",
+        },
+        label:{
+          fontSize: "18px",
+          fontWeight: "bold",
+          color: "grey",
+        }
+      },
+      
+
+    }
+  
   },
 });

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { createBoard } from "../store/reducers/taskSlice";
+import { useDispatch, useSelector } from "react-redux";
+// import {  createBoardAsync } from "../store/reducers/taskSlice";
 
 import {
   Modal,
@@ -12,6 +12,7 @@ import {
   Input,
   Flex,
 } from "@chakra-ui/react";
+import { createBoardAsync } from "../store/reducers/taskSlice";
 
 interface CreateBoardModalProps {
   isOpen: boolean;
@@ -19,22 +20,16 @@ interface CreateBoardModalProps {
 }
 
 const CreateBoard: React.FC<CreateBoardModalProps> = ({ isOpen, onClose }) => {
-  const [boardTitle, setBoardTitle] = useState<string | null>("");
-  const dispatch = useDispatch();
+  const  [boardTitle, setBoardTitle] = useState<string>('');
+  const token = useSelector((state: any) => state.auth.token);
+  const dispatch = useDispatch<any>();
+  const loading = useSelector((state: any) => state.task.loading);
 
   const addToBoard = () => {
-    dispatch(
-      createBoard({
-        title: boardTitle,
-        columns: [
-          {
-            columnTitle: "",
-            cards: [],
-          },
-        ],
-      })
-    );
+   dispatch(createBoardAsync({ name: boardTitle, token: token }));
   };
+
+
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -72,10 +67,13 @@ const CreateBoard: React.FC<CreateBoardModalProps> = ({ isOpen, onClose }) => {
           </Button>
 
           <Button
-            
+            isLoading={loading}
+            loadingText='logging in'
+            colorScheme='blue'
+            variant='outline'
             onClick={() => {
               addToBoard();
-              setBoardTitle(null);
+              setBoardTitle('');
               onClose()
             }}
           >

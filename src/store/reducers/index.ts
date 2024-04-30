@@ -1,12 +1,13 @@
 // reducers/index.js
 import { combineReducers } from "@reduxjs/toolkit";
-import counterReducer from "./counterSilce";
 import taskReducer from "./taskSlice";
+import authReducer from "./authSlice";
+
 // import other reducers
 
 const rootReducer = combineReducers({
-  counter: counterReducer,
-  task: taskReducer
+  task: taskReducer,
+  auth: authReducer,
 });
 
 export default rootReducer;

@@ -23,7 +23,7 @@ export default function AllBoard() {
                 <ul>
                   {board.columns.map((column: any) => (
                     <li key={column.columnTitle}>
-                      <h4>{column.columnTitle}</h4>
+                      <h1>{column.columnTitle}</h1>
                       <ul>
                         {column.cards.map((card: any) => (
                           <li key={card.columnTaskTitle}>
