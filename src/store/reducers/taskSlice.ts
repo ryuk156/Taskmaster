@@ -3,6 +3,8 @@ import { Board, Columntask, Column, URL } from "../../interfaces/interface";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { debounce } from 'lodash';
+
 
 export const initialState = {
   boards: [],
@@ -202,34 +204,35 @@ export const updateCardAsync = createAsyncThunk(
 );
 
 export const swapCardAsync = createAsyncThunk(
-  "task/swapCardAsync",
-  async (
-    cardData: { token: any; card_1: any; card_2: any },
-    { rejectWithValue }
-  ) => {
-    try {
-      const config = {
-        headers: {
-          Authorization: `Token ${cardData.token.token}`,
-        },
-      };
-      const requestData = { card_1: cardData.card_1, card_2: cardData.card_2 }; // Properly format request data
-      const response = await axios.put(
-        `${URL}swapcard/`, // Ensure URL variable is defined and contains the correct base URL
-        requestData, // Send formatted request data
-        config
-      );
-
-      return response.data;
-    } catch (error: any) {
-      console.error("Axios error:", error.message);
-      return rejectWithValue({
-        status: error.response.status,
-        data: error.response.data,
-      });
+    "task/swapCardAsync",
+    async (
+      { card_1, card_2, token }: { card_1: any; card_2: any; token: any },
+      { rejectWithValue }
+    ) => {
+      try {
+        const config = {
+          headers: {
+            Authorization: `Token ${token.token}`,
+          },
+        };
+        const requestData = { card_1, card_2 }; // Properly format request data
+        const response = await axios.put(
+          `${URL}swapcard/`,
+          requestData,
+          config
+        );
+  
+        return requestData;
+      } catch (error: any) {
+        console.error("Axios error:", error.message);
+        return rejectWithValue({
+          status: error.response.status,
+          data: error.response.data,
+        });
+      }
     }
-  }
-);
+  );
+  
 
 export const deleteCardAsync = createAsyncThunk(
   "task/deleteCardAsync",
@@ -249,7 +252,7 @@ export const deleteCardAsync = createAsyncThunk(
 
       return cardData.cardid;;
     } catch (error: any) {
-      console.error("Axios error:", error.message);
+      console.error("Axios error:", error.response.data);
       return rejectWithValue({
         status: error.response.status,
         data: error.response.data,
@@ -257,6 +260,23 @@ export const deleteCardAsync = createAsyncThunk(
     }
   }
 );
+
+
+const debounceSwapCards = debounce(async (dispatch, { card_1, card_2 , token }) => {
+    try {
+      // Dispatch the swapCardAsync action with the payload
+      await dispatch(swapCardAsync({
+          card_1, card_2,
+          token:  token 
+      }));
+    } catch (error) {
+      console.error("Error swapping cards:", error);
+    }
+  }, 200); // Adjust the delay as needed
+  
+  export const swapCardDebounced = (payload:any) => (dispatch: any) => {
+    debounceSwapCards(dispatch, payload);
+  };
 
 const taskSlice = createSlice({
   name: "task",
@@ -495,6 +515,31 @@ const taskSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      
+      .addCase(swapCardAsync.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(swapCardAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        const { card_1, card_2 } = action.payload;
+        
+        const card1Index = state.cards.findIndex((card: any) => card.id === card_1);
+        const card2Index = state.cards.findIndex((card: any) => card.id === card_2);
+        if (card1Index !== -1 && card2Index !== -1) {
+          const temp = state.cards[card1Index];
+          state.cards[card1Index] = state.cards[card2Index];
+          state.cards[card2Index] = temp;
+        }
+
+       
+       
+ 
+      })
+      .addCase(swapCardAsync.rejected, (state, action: any) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 

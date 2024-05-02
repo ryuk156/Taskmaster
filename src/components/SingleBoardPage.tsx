@@ -1,18 +1,31 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { Box, Button, filter, Flex } from "@chakra-ui/react";
+import { Box, Button, Flex } from "@chakra-ui/react";
 
 import CreateBoardColumn from "./CreateBoardColumn";
 import CreateCardModal from "./CreateCardModal";
 import Column from "./Column";
 import Card from "./Card";
-import { deleteCardAsync, getCardsAsync, getColumnsAsync, swapCard, swapCardAsync } from "../store/reducers/taskSlice";
+import CircleLoader from "./CircleLoader";
+
+import {
+  deleteCardAsync,
+  getCardsAsync,
+  getColumnsAsync,
+  swapCard,
+  swapCardAsync,
+  swapCardDebounced,
+} from "../store/reducers/taskSlice";
+import ErrorAlert from "./ErrorAlert";
+import VanishableAlert from "./VanishableAlert";
 
 function SingleBoardPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenColumn, setIsOpenColumn] = useState(false);
   const [columnId, setColumnId] = useState<number>(0);
+  const [moveCardLoading, setMoveCardLoading] = useState(false); // New state for move card loading
+  const error = useSelector((state: any) => state.task.error);
 
   const dispatch = useDispatch<any>(); // Redux dispatch function
   const columns = useSelector((state: any) => state.task.columns);
@@ -28,76 +41,77 @@ function SingleBoardPage() {
   const onCloseColumn = useCallback(() => setIsOpenColumn(false), []);
   const onOpenColumn = useCallback(() => setIsOpenColumn(true), []);
 
-
   const { boardId } = useParams();
   const parsedBoardId = boardId ? parseInt(boardId) : undefined;
 
   const moveColumn = (dragIndex: number, hoverIndex: number) => {
     //dispatch(swapColumn({ parsedBoardId, dragIndex, hoverIndex }));
-  }
+  };
 
   const board = useSelector((state: any) =>
     state.task.boards.find((task: any) => task.id === parsedBoardId)
   );
 
-  const  filteredColumns = columns.filter((column: any) => column.board === parsedBoardId);
-  const  statecards = useSelector((state: any) => state.task.cards);
+  const filteredColumns = columns.filter(
+    (column: any) => column.board === parsedBoardId
+  );
+  const statecards = useSelector((state: any) => state.task.cards);
 
   useEffect(() => {
     dispatch(getColumnsAsync(token));
     dispatch(getCardsAsync(token));
   }, [dispatch, token, parsedBoardId]);
 
-  const moveCard = useCallback(
-    (
-      dragColumnIndex: number,
-      hoverColumnIndex: number,
-      dragCardIndex: number,
-      hoverCardIndex: number
-    ) => {
-      
-     const dragcard=  statecards[dragCardIndex]?.id;
-     const hovercard=  statecards[hoverCardIndex]?.id;
-      console.log(dragcard, hovercard , "drag and hover card")
-      dispatch(
-        swapCard({
-          parsedBoardId,
-          dragColumnIndex,
-          hoverColumnIndex,
-          dragCardIndex,
-          hoverCardIndex,
-        })
-      );
-     dispatch(swapCardAsync({card_1: dragcard , card_2: hovercard , token: token}))
-    },
-    [dispatch, parsedBoardId]
-  );
+  const moveCard = async (
+    dragColumnIndex: number,
+    hoverColumnIndex: number,
+    dragCardIndex: number,
+    hoverCardIndex: number
+  ) => {
+    const dragcard = statecards[dragCardIndex]?.id;
+    const hovercard = statecards[hoverCardIndex]?.id;
+    console.log(dragcard, hovercard, "drag and hover card");
+
+    try {
+      // Set move card loading state to true before dispatching the action
+    setMoveCardLoading(true);
+      // Dispatch the asynchronous action to swap cards
+; // Pass an empty object as an argument
+dispatch(swapCardDebounced({ card_1: dragcard, card_2: hovercard ,token: token}));
+      // Assuming that the Redux store is updated correctly, no need to update state here.
+    } catch (error) {
+      console.error("Error swapping cards:", error);
+    } finally {
+      // Reset move card loading state to false after the action is completed
+      setMoveCardLoading(false);
+    }
+  };
 
   if (!board) {
     return <div>Board not found!</div>;
   }
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // if (loading) {
+  //   return <CircleLoader text="Loading" />;
+  // }
 
-  const  handleDelete = (cardId: number) => {
+  const handleDelete = (cardId: number) => {
     dispatch(deleteCardAsync({ token, cardid: cardId }));
-  }
-
-  
+  };
 
   return (
     <Box m={2}>
+
+      {loading && <VanishableAlert message="loading" />}
+     
+      {error && <ErrorAlert error={error.data.message} status="error" />}
       <Flex justifyContent={"space-between"}>
-        <Box m={1} ml={3} mb={0}
-        
-        fontSize={"25px"} fontWeight={"bold"}>
+        <Box m={1} ml={3} mb={0} fontSize={"25px"} fontWeight={"bold"}>
           {board.name}
         </Box>
 
         <Button
-          variant={'solid'}
+          variant={"solid"}
           m={2}
           size={"sm"}
           width={"150px"}
@@ -121,9 +135,7 @@ function SingleBoardPage() {
         overflow={"scroll"}
         width={"100%"}
       >
-
-      {
-        filteredColumns && filteredColumns.length !== 0 ? (
+        {filteredColumns && filteredColumns.length !== 0 ? (
           filteredColumns.map((column: any, colIndex: number) => {
             return (
               <Column
@@ -150,19 +162,20 @@ function SingleBoardPage() {
                     }
                     return null;
                   })}
-                  <Box mt={1}></Box>
-                <Button colorScheme={"blue"}  size={"sm"}  onClick={() => onOpen(column.id)}>+Add  card</Button>
+                <Box mt={1}></Box>
+                <Button
+                  colorScheme={"blue"}
+                  size={"sm"}
+                  onClick={() => onOpen(column.id)}
+                >
+                  +Add card
+                </Button>
               </Column>
             );
           })
         ) : (
           <Box>No columns found</Box>
-        )
-      }
-
-
-
-     
+        )}
       </Box>
       <CreateCardModal isOpen={isOpen} onClose={onClose} columnId={columnId} />
     </Box>
@@ -170,3 +183,7 @@ function SingleBoardPage() {
 }
 
 export default SingleBoardPage;
+function debounceSwapCards(dragcard: any, hovercard: any) {
+  throw new Error("Function not implemented.");
+}
+
