@@ -29,4 +29,4 @@ export interface LoginCredentials {
 }
 
 
-export const URL= 'http://127.0.0.1:8082/api/'
+export const URL= 'https://taskmaster-coral.vercel.app/api/'
