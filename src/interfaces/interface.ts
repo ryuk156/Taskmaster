@@ -29,4 +29,4 @@ export interface LoginCredentials {
 }
 
 
-export const URL= 'https://taskmaster-coral.vercel.app/api/'
+export const URL= 'https://yash15601.pythonanywhere.com/api/'
