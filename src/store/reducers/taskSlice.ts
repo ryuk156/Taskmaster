@@ -12,6 +12,7 @@ export const initialState = {
   cards: [],
   loading: false,
   error: null,
+  success: false,
 };
 
 export const getBoardsAsync = createAsyncThunk(
@@ -481,6 +482,7 @@ const taskSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.cards = [...state.cards, action.payload] as typeof state.cards;
+        state.success = true;
       })
       .addCase(createCardAsync.rejected, (state, action: any) => {
         state.loading = false;
@@ -501,6 +503,7 @@ const taskSlice = createSlice({
         } else {
           state.cards.push(updatedcard as (typeof state.cards)[number]);
         }
+        state.success = true;
       })
       .addCase(updateCardAsync.rejected, (state, action: any) => {
         state.loading = false;
@@ -511,9 +514,11 @@ const taskSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.cards = state.cards.filter((card:any) => card.id !== action.payload);
+        state.success = true;
       }).addCase(deleteCardAsync.rejected, (state, action: any) => {
         state.loading = false;
         state.error = action.payload;
+
       })
       
       .addCase(swapCardAsync.pending, (state, action) => {
@@ -532,7 +537,7 @@ const taskSlice = createSlice({
           state.cards[card2Index] = temp;
         }
 
-       
+       state.success = true;
        
  
       })

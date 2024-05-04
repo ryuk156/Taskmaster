@@ -14,9 +14,14 @@ export interface AuthState {
   success: boolean;
 }
 
+const userToken = localStorage.getItem('userToken')
+  ? localStorage.getItem('userToken')
+  : null
+
+
 const initialState: AuthState = {
-  token: null,
-  isAuthenticated: false,
+  token: userToken,
+  isAuthenticated: userToken ? true : false,
   loading: false,
   userInfo: {},
   error: null,
@@ -99,6 +104,9 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.error = null;
     },
+    setIsAuthenticated(state, action) {
+      state.isAuthenticated = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(userLogin.pending, (state, action) => {
@@ -137,5 +145,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setToken, clearToken } = authSlice.actions;
+export const { setToken, clearToken,setIsAuthenticated } = authSlice.actions;
 export default authSlice.reducer;

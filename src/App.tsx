@@ -4,7 +4,7 @@ import { ChakraBaseProvider } from "@chakra-ui/react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useDispatch, useSelector } from "react-redux";
-import { setToken } from "./store/reducers/authSlice";
+import { setIsAuthenticated, setToken } from "./store/reducers/authSlice";
 import Navbar from "./components/Navbar";
 import Dashboard from "./components/Dashboard";
 import SingleBoardPage from "./components/SingleBoardPage";
@@ -21,6 +21,7 @@ function App() {
     const token = localStorage.getItem("userToken");
     if (token && !isAuthenticated) {
       dispatch(setToken(token));
+      dispatch(setIsAuthenticated(true));
     }
   }, [dispatch, isAuthenticated]);
 

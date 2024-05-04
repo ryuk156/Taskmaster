@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { Alert, AlertIcon,Text, Box, CloseButton, Flex, Spinner } from "@chakra-ui/react";
+import { stat } from "fs";
+import { InfoIcon } from "@chakra-ui/icons";
 
-const VanishableAlert = ({ message }: { message: string }) => {
+const VanishableAlert = ({ message, status }: { message: string, status?: any }) => {
   const [showAlert, setShowAlert] = useState(true);
 
   const handleClose = () => {
     setShowAlert(false);
+
   };
 
   return (
@@ -19,7 +22,7 @@ const VanishableAlert = ({ message }: { message: string }) => {
           width="300px" // Adjust the width as needed
         >
           <Alert
-            status="info"
+            status= {status?status: "info"}
             variant="subtle"
             flexDirection="column"
             alignItems="start"
@@ -29,15 +32,17 @@ const VanishableAlert = ({ message }: { message: string }) => {
           >
             <Flex justifyContent={"center"} alignItems={"center"}>
                 
-          
-            <Spinner
-              thickness="4px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              color="blue.500"
-              size="md"
-              pr="2"
-            />
+          {
+            status === "loading" ?  <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            
+            size="md"
+            pr="2"
+          /> : <InfoIcon  />
+          }
+            
            <Text ml={2} mr={2}> {message}</Text>
             <CloseButton
               position="absolute"

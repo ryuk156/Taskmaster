@@ -19,6 +19,7 @@ import { AuthState, userLogin } from "../../store/reducers/authSlice";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import ErrorAlert from "../ErrorAlert";
+import VanishableAlert from "../VanishableAlert";
 
 const styles = {
   container: {
@@ -87,7 +88,7 @@ const Login = () => {
       alignItems={"center"}
     
     >
-      {error && <ErrorAlert error={error.data.message} status="error" />}
+     {error && <VanishableAlert message={error.data.message} status="error" />}
       <Flex
         flexDirection={"column"}
         justifyContent={"center"}

@@ -11,6 +11,7 @@ import CircleLoader from "./CircleLoader";
 
 import {
   deleteCardAsync,
+  getBoardsAsync,
   getCardsAsync,
   getColumnsAsync,
   swapCard,
@@ -19,25 +20,25 @@ import {
 } from "../store/reducers/taskSlice";
 import ErrorAlert from "./ErrorAlert";
 import VanishableAlert from "./VanishableAlert";
+import { set } from "lodash";
+import { setToken } from "../store/reducers/authSlice";
 
 function SingleBoardPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenColumn, setIsOpenColumn] = useState(false);
   const [columnId, setColumnId] = useState<number>(0);
-  const [moveCardLoading, setMoveCardLoading] = useState(false); // New state for move card loading
   const error = useSelector((state: any) => state.task.error);
-
   const dispatch = useDispatch<any>(); // Redux dispatch function
   const columns = useSelector((state: any) => state.task.columns);
-  const token = useSelector((state: any) => state.auth.token);
+ const token = useSelector((state: any) => state.auth.token);
   const loading = useSelector((state: any) => state.task.loading);
   const cards = useSelector((state: any) => state.task.cards);
+  const  success = useSelector((state: any) => state.task.success);
   const onClose = useCallback(() => setIsOpen(false), []);
   const onOpen = useCallback((columnId: number) => {
     setIsOpen(true);
     setColumnId(columnId);
   }, []);
-
   const onCloseColumn = useCallback(() => setIsOpenColumn(false), []);
   const onOpenColumn = useCallback(() => setIsOpenColumn(true), []);
 
@@ -58,9 +59,15 @@ function SingleBoardPage() {
   const statecards = useSelector((state: any) => state.task.cards);
 
   useEffect(() => {
-    dispatch(getColumnsAsync(token));
-    dispatch(getCardsAsync(token));
-  }, [dispatch, token, parsedBoardId]);
+    let userToken = localStorage.getItem("userToken");
+
+    if (userToken) {
+      dispatch(setToken({token: userToken}));
+      dispatch(getBoardsAsync({ token: userToken }));
+      dispatch(getColumnsAsync({ token: userToken }));
+      dispatch(getCardsAsync({ token: userToken }));
+    }
+  }, [dispatch, parsedBoardId]);
 
   const moveCard = async (
     dragColumnIndex: number,
@@ -70,30 +77,20 @@ function SingleBoardPage() {
   ) => {
     const dragcard = statecards[dragCardIndex]?.id;
     const hovercard = statecards[hoverCardIndex]?.id;
-    console.log(dragcard, hovercard, "drag and hover card");
 
     try {
-      // Set move card loading state to true before dispatching the action
-    setMoveCardLoading(true);
-      // Dispatch the asynchronous action to swap cards
-; // Pass an empty object as an argument
-dispatch(swapCardDebounced({ card_1: dragcard, card_2: hovercard ,token: token}));
-      // Assuming that the Redux store is updated correctly, no need to update state here.
+      dispatch(
+        swapCardDebounced({ card_1: dragcard, card_2: hovercard,token: token })
+      );
     } catch (error) {
-      console.error("Error swapping cards:", error);
-    } finally {
-      // Reset move card loading state to false after the action is completed
-      setMoveCardLoading(false);
-    }
+      console.error("Error moving card:", error);
+    } 
   };
 
   if (!board) {
-    return <div>Board not found!</div>;
+    return <VanishableAlert message="Board not found" />;
   }
 
-  // if (loading) {
-  //   return <CircleLoader text="Loading" />;
-  // }
 
   const handleDelete = (cardId: number) => {
     dispatch(deleteCardAsync({ token, cardid: cardId }));
@@ -101,10 +98,9 @@ dispatch(swapCardDebounced({ card_1: dragcard, card_2: hovercard ,token: token})
 
   return (
     <Box m={2}>
-
-      {loading && <VanishableAlert message="loading" />}
-     
-      {error && <ErrorAlert error={error.data.message} status="error" />}
+      {loading && <VanishableAlert message="loading" status={"loading"} />}
+      {error && <VanishableAlert message={error.data.error} status="error"  />}
+      {success && <VanishableAlert message="Success" status="success" />}
       <Flex justifyContent={"space-between"}>
         <Box m={1} ml={3} mb={0} fontSize={"25px"} fontWeight={"bold"}>
           {board.name}
@@ -183,7 +179,4 @@ dispatch(swapCardDebounced({ card_1: dragcard, card_2: hovercard ,token: token})
 }
 
 export default SingleBoardPage;
-function debounceSwapCards(dragcard: any, hovercard: any) {
-  throw new Error("Function not implemented.");
-}
 

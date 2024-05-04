@@ -110,6 +110,8 @@ const Card: React.FC<CardProps> = ({
     onOpen();
   };
 
+  
+
   const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditedContent(e.target.value);
   };
