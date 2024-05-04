@@ -20,7 +20,7 @@ export const getBoardsAsync = createAsyncThunk(
   async (token: any, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8082/api/viewboards/",
+        `${URL}api/viewboards/`,
         {
           headers: {
             Authorization: `Token ${token.token}`,
@@ -44,7 +44,7 @@ export const getColumnsAsync = createAsyncThunk(
   async (token: any, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8082/api/viewcolumns/`,
+        `${URL}api/viewcolumns/`,
         {
           headers: {
             Authorization: `Token ${token.token}`,
@@ -67,7 +67,7 @@ export const getCardsAsync = createAsyncThunk(
   "task/getCardsAsync",
   async (token: any, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`http://127.0.0.1:8082/api/viewcards/`, {
+      const response = await axios.get(`${URL}api/viewcards/`, {
         headers: {
           Authorization: `Token ${token.token}`,
         },
