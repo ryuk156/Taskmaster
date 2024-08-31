@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import CreateBoard from "./CreateBoard";
 import { getBoardsAsync } from "../store/reducers/taskSlice";
 import VanishableAlert from "./VanishableAlert";
+import AllUserModal from "./AllUserModal";
 
 export default function AllBoard() {
   const dispatch = useDispatch<any>();
@@ -12,6 +13,7 @@ export default function AllBoard() {
   const token = useSelector((state: any) => state.auth.token);
   const boards = useSelector((state: any) => state.task.boards);
   const loading = useSelector((state: any) => state.task.loading);
+
 
   const onClose = () => setIsOpen(false);
   const onOpen = () => setIsOpen(true);
@@ -36,6 +38,7 @@ export default function AllBoard() {
       
 
       <Flex justifyContent="flex-end" alignItems="flex-start">
+     
         <Button mt={4} mr={5} colorScheme="blue" variant="outline" onClick={onOpen}>
           + Add Board
         </Button>

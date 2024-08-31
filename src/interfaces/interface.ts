@@ -29,4 +29,5 @@ export interface LoginCredentials {
 }
 
 
-export const URL= 'https://yash15601.pythonanywhere.com/api/'
+export const URL1= 'https://yash15601.pythonanywhere.com/api/'
+export const URL= 'http://127.0.0.1:8082/api/'

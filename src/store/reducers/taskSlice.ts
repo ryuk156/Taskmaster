@@ -10,10 +10,37 @@ export const initialState = {
   boards: [],
   columns: [],
   cards: [],
+  users: [],
   loading: false,
   error: null,
   success: false,
 };
+
+
+export const getUsersAsync = createAsyncThunk(
+    "task/getUsersAsync",
+    async (token: any, { rejectWithValue }) => {
+      try {
+        const response = await axios.get(
+          `${URL}userlist/`,
+          {
+            headers: {
+              Authorization: `Token ${token.token}`,
+            },
+          }
+        );
+        console.log(response.data);
+        return response.data;
+      } catch (error: any) {
+        console.log(error.response);
+        return rejectWithValue({
+          status: error.response.status,
+          data: error.response.data,
+        });
+      }
+    }
+  );
+  
 
 export const getBoardsAsync = createAsyncThunk(
   "task/getBoardsAsync",
@@ -109,6 +136,37 @@ export const createBoardAsync = createAsyncThunk(
     }
   }
 );
+
+export const shareBoardAsync = createAsyncThunk(
+    "task/shareBoardAsync",
+    async (
+     data: { name: string; token: any; board_id: any },
+      { rejectWithValue }
+    ) => {
+      try {
+        const config = {
+          headers: {
+            Authorization: `Token ${data.token.token}`,
+          },
+        };
+        const requestData = { userid: data.name }; // Properly format request data
+        const response = await axios.post(
+          `${URL}shareboard/${parseInt(data.board_id)}/`, // Ensure URL variable is defined and contains the correct base URL
+          requestData, // Send formatted request data
+          config
+        );
+  
+        return response.data;
+      } catch (error: any) {
+        console.error("Axios error:", error.message);
+        return rejectWithValue({
+          status: error.response.status,
+          data: error.response.data,
+        });
+      }
+    }
+  );
+
 
 export const createColumnAsync = createAsyncThunk(
   "task/createColumnAsync",
@@ -412,6 +470,19 @@ const taskSlice = createSlice({
   // },
   extraReducers: (builder) => {
     builder
+    .addCase(getUsersAsync.pending, (state, action) => {   
+        state.loading = true;
+      
+     }).addCase(getUsersAsync.fulfilled, (state, action) => {
+        state.users = action.payload;
+        state.loading = false;
+        state.error = null;
+      
+     }).addCase(getUsersAsync.rejected, (state, action: any) => {
+        state.loading = false;
+        state.error = action.payload;
+      
+     })
       .addCase(getBoardsAsync.pending, (state, action) => {
         state.loading = true;
       })
@@ -542,6 +613,15 @@ const taskSlice = createSlice({
  
       })
       .addCase(swapCardAsync.rejected, (state, action: any) => {
+        state.loading = false;
+        state.error = action.payload;
+      }).addCase(shareBoardAsync.pending, (state, action) => {
+        state.loading = true;
+      }).addCase(shareBoardAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.success = true;
+      }).addCase(shareBoardAsync.rejected, (state, action: any) => {
         state.loading = false;
         state.error = action.payload;
       });

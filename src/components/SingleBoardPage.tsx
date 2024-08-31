@@ -22,6 +22,7 @@ import ErrorAlert from "./ErrorAlert";
 import VanishableAlert from "./VanishableAlert";
 import { set } from "lodash";
 import { setToken } from "../store/reducers/authSlice";
+import AllUserModal from "./AllUserModal";
 
 function SingleBoardPage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,6 +42,7 @@ function SingleBoardPage() {
   }, []);
   const onCloseColumn = useCallback(() => setIsOpenColumn(false), []);
   const onOpenColumn = useCallback(() => setIsOpenColumn(true), []);
+  const [isOpened, setIsOpened] = useState(false);
 
   const { boardId } = useParams();
   const parsedBoardId = boardId ? parseInt(boardId) : undefined;
@@ -105,6 +107,11 @@ function SingleBoardPage() {
         <Box m={1} ml={3} mb={0} fontSize={"25px"} fontWeight={"bold"}>
           {board.name}
         </Box>
+        <Button mt={4} mr={5}  colorScheme="blue" variant="outline" onClick={()=>setIsOpened(true)}>
+          Open Modal
+        </Button>
+        <AllUserModal isOpen={isOpened} onClose={()=>setIsOpened(false)} />;
+        
 
         <Button
           variant={"solid"}

@@ -140,6 +140,7 @@ const Card: React.FC<CardProps> = ({
     <div>
       {isEditing ? (
         <Input
+        type="textarea"
           value={editedContent}
           onChange={handleContentChange}
           onBlur={handleBlur}
