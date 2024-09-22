@@ -73,11 +73,12 @@ const Login = () => {
     }
 
     try {
-      await dispatch<any>(userLogin(credentials));
-      // Redirect to the dashboard once logged in
-      navigate("/");
+    let response =   await dispatch<any>(userLogin(credentials));
+    if(response.payload.status === 200){
+      navigate('/dashboard');
+    }
+
     } catch (err: any) {
-      console.log(err.data.message);
     }
   };
 
@@ -149,7 +150,7 @@ const Login = () => {
         </Stack>
         <Text mt="2">
           Don't have an account?{" "}
-          <Link color="blue.500" href="/signup">
+          <Link color="blue.500" href="/signUp">
             SignUp
           </Link>
         </Text>

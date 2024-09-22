@@ -77,7 +77,8 @@ export const userLogin = createAsyncThunk(
         localStorage.setItem('userToken', data.token)
         return data
       } catch (error:  any) {
-        console.error("Axios error:", error.message);
+        console.error("Axios error:", error.response.data);
+        
         return rejectWithValue({
             status: error.response.status,
             data: error.response.data,

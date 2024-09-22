@@ -13,10 +13,15 @@ import {
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { AuthState, userLogin, userSignUp } from "../../store/reducers/authSlice";
+import {
+  AuthState,
+  userLogin,
+  userSignUp,
+} from "../../store/reducers/authSlice";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import ErrorAlert from "../ErrorAlert";
+import VanishableAlert from "../VanishableAlert";
 
 const styles = {
   container: {
@@ -48,20 +53,29 @@ const SignUp = () => {
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
-    email: ""
+    email: "",
   });
 
   const handleSubmit = async () => {
     try {
-      await dispatch<any>(userSignUp({
-        username: credentials.username,
-        email: credentials.email,
-        password: credentials.password
-      }));
+      await dispatch<any>(
+        userSignUp({
+          username: credentials.username,
+          email: credentials.email,
+          password: credentials.password,
+        })
+      );
+
+      // if(error===null){
+      //   navigate('/dashboard');
+      // }else{
+      //   // navigate('/signUp');
+      //   // console.log(error.response.data);
+      //   console.log(error.response.data);
+      // }
       // Redirect to the dashboard once logged in
-      navigate('/');
-    } catch (err) {
-      console.log(err);
+    } catch (err: any) {
+      console.log(err.response.data);
     }
   };
 
@@ -71,7 +85,14 @@ const SignUp = () => {
       justifyContent={"center"}
       alignItems={"center"}
     >
-      {error && <ErrorAlert error={error} status="error" />}
+      {error &&
+        Object.keys(error.data).map((key) => (
+          <VanishableAlert
+            key={key}
+            message={`${error.data[key][0]}`}
+            status="error"
+          />
+        ))}
       <Flex
         flexDirection={"column"}
         justifyContent={"center"}
@@ -79,10 +100,10 @@ const SignUp = () => {
         style={styles.container}
       >
         <Heading variant={"h6"}>Register</Heading>
-       
+
         <Box mt={1}>
           <FormControl isRequired>
-          <FormLabel>Username</FormLabel>
+            <FormLabel>Username</FormLabel>
             <Input
               size="lg"
               id="username"
@@ -96,7 +117,7 @@ const SignUp = () => {
         </Box>
         <Box>
           <FormControl isRequired>
-          <FormLabel>email</FormLabel>
+            <FormLabel>email</FormLabel>
             <Input
               size="lg"
               id="username"
@@ -111,7 +132,7 @@ const SignUp = () => {
         </Box>
         <Box>
           <FormControl isRequired>
-          <FormLabel>Password</FormLabel>
+            <FormLabel>Password</FormLabel>
             <Input
               size="lg"
               id="password"
@@ -125,20 +146,20 @@ const SignUp = () => {
           </FormControl>
         </Box>
 
-        <Stack direction='row' spacing={4}>
-  <Button
-    isLoading={loading}
-    loadingText='logging in'
-    colorScheme='blue'
-    variant='outline'
-    onClick={handleSubmit}
-  >
-    SignUP
-  </Button>
-</Stack>
+        <Stack direction="row" spacing={4}>
+          <Button
+            isLoading={loading}
+            loadingText="logging in"
+            colorScheme="blue"
+            variant="outline"
+            onClick={handleSubmit}
+          >
+            SignUP
+          </Button>
+        </Stack>
         <Text mt="2">
           Alreday have account?{" "}
-          <Link color="blue.500" href="/login">
+          <Link color="blue.500" href="/">
             Login
           </Link>
         </Text>
