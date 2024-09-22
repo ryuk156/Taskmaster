@@ -154,7 +154,7 @@ const SignUp = () => {
             variant="outline"
             onClick={handleSubmit}
           >
-            SignUP
+            Signup
           </Button>
         </Stack>
         <Text mt="2">
