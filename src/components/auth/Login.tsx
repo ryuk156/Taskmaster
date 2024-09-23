@@ -73,10 +73,8 @@ const Login = () => {
     }
 
     try {
-    let response =   await dispatch<any>(userLogin(credentials));
-    if(response.payload.status === 200){
-      navigate('/dashboard');
-    }
+     await dispatch<any>(userLogin(credentials));
+    navigate('/dashboard');
 
     } catch (err: any) {
     }
