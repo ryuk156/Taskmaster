@@ -67,7 +67,7 @@ const SignUp = () => {
       );
 
       // if(error===null){
-      //   navigate('/dashboard');
+        navigate('/dashboard');
       // }else{
       //   // navigate('/signUp');
       //   // console.log(error.response.data);
@@ -85,6 +85,7 @@ const SignUp = () => {
       justifyContent={"center"}
       alignItems={"center"}
     >
+      
       {error &&
         Object.keys(error.data).map((key) => (
           <VanishableAlert
