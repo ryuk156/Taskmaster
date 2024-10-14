@@ -170,8 +170,9 @@ const Card: React.FC<CardProps> = ({
               }}
             />
           </Flex>
-          <Text m={2} mt={1}>
-            {card.content}
+          <Text m={2} mt={1} isTruncated>
+          {card.content.split(" ").slice(0, 3).join(" ")}
+          {card.content.split(" ").length > 10 ? "..." : ""}
           </Text>
         </ChakraCard>
       )}
