@@ -14,6 +14,10 @@ import {
   FormErrorMessage,
   Icon,
   IconButton,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -181,6 +185,18 @@ const Login = () => {
           </Link>
         </Text>
       </Flex>
+
+      <Box position="fixed"  bottom={0} padding={4}>
+        <Alert status="info" borderRadius="md">
+          <AlertIcon />
+          <Box flex="1">
+            <AlertTitle>Guest Account Info:</AlertTitle>
+            <AlertDescription>
+              Username: <strong>guest</strong> | Password: <strong>guest123</strong>
+            </AlertDescription>
+          </Box>
+        </Alert>
+      </Box>
     </Flex>
   );
 };
