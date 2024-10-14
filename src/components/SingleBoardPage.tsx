@@ -107,9 +107,7 @@ function SingleBoardPage() {
         <Box m={1} ml={3} mb={0} fontSize={"25px"} fontWeight={"bold"}>
           {board.name}
         </Box>
-        <Button mt={4} mr={5}  colorScheme="blue" variant="outline" onClick={()=>setIsOpened(true)}>
-          Open Modal
-        </Button>
+      
         <AllUserModal isOpen={isOpened} onClose={()=>setIsOpened(false)} />;
         
 

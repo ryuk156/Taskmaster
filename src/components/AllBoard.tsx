@@ -1,4 +1,4 @@
-import { Box, Button, Flex } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -32,9 +32,9 @@ export default function AllBoard() {
  
 
   return (
-    <div className="app">
+    <Box className="app">
       {loading && <VanishableAlert message="Loading ..." status={"loading"} />}
-
+      <Text fontSize={"28px"} fontWeight={"bold"}>TaskMaster</Text>
       
 
       <Flex justifyContent="flex-end" alignItems="flex-start">
@@ -68,6 +68,6 @@ export default function AllBoard() {
           ))}
         <CreateBoard isOpen={isOpen} onClose={onClose} />
       </Box>
-    </div>
+    </Box>
   );
 }
