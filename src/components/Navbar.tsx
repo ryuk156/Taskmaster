@@ -1,3 +1,4 @@
+import { CheckCircleIcon } from "@chakra-ui/icons";
 import { Box, Flex, Spacer, Text, Button } from "@chakra-ui/react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +14,11 @@ export default function Navbar() {
     <Box bg="white.500" p={4} boxShadow="0px 4px 8px rgba(0, 0, 0, 0.1)">
       <Flex alignItems="center">
         <Text fontSize="xl" fontWeight="bold" color="Black">
-          Task Master
+        <CheckCircleIcon
+             
+              fontSize={"30px"}
+              color="blue.500"
+            />  TaskMaster
         </Text>
         <Spacer />
         <Button variant={"outline"} mr={2} onClick={logout} colorScheme="blue">

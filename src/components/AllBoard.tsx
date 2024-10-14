@@ -34,10 +34,11 @@ export default function AllBoard() {
   return (
     <Box className="app">
       {loading && <VanishableAlert message="Loading ..." status={"loading"} />}
-      <Text fontSize={"28px"} fontWeight={"bold"}>TaskMaster</Text>
+     
       
 
-      <Flex justifyContent="flex-end" alignItems="flex-start">
+      <Flex justifyContent="space-between" alignItems="flex-start">
+       <Text mt={4} ml={5} fontSize={"28px"} fontWeight={"bold"}>Boards</Text>
      
         <Button mt={4} mr={5} colorScheme="blue" variant="outline" onClick={onOpen}>
           + Add Board

@@ -146,6 +146,7 @@ const Card: React.FC<CardProps> = ({
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           autoFocus
+          mt={2}
         />
       ) : (
         <ChakraCard
