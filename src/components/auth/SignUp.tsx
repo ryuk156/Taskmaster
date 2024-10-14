@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import ErrorAlert from "../ErrorAlert";
 import VanishableAlert from "../VanishableAlert";
+import { CheckCircleIcon } from "@chakra-ui/icons";
 
 const styles = {
   container: {
@@ -30,7 +31,11 @@ const styles = {
     boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
     padding: "20px",
     width: "370px",
-    marginTop: "10%",
+    marginTop: "2%",
+  },
+  Titlecontainer: {
+    marginTop: "8%",
+    marginBottom: "0px",
   },
   input: {
     border: "1px solid #CBD5E0",
@@ -94,13 +99,31 @@ const SignUp = () => {
             status="error"
           />
         ))}
+
+<Flex 
+      
+      flexDirection={"row"}
+      justifyContent={"center"}
+      alignItems={"center"}
+      alignContent={
+        "center"
+      }
+      style={styles.Titlecontainer}
+      >
+      <CheckCircleIcon
+             
+              fontSize={"50px"}
+              color="blue.500"
+            />
+             <Text fontSize={"28px"} fontWeight={"bold"} >TaskMaster</Text> 
+      </Flex>
       <Flex
         flexDirection={"column"}
         justifyContent={"center"}
         alignItems={"center"}
         style={styles.container}
       >
-        <Heading variant={"h6"}>Register</Heading>
+        <Text fontSize={"25px"} fontWeight={"bold"} ml={2}>Register</Text> 
 
         <Box mt={1}>
           <FormControl isRequired>
